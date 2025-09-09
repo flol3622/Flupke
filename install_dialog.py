@@ -4,6 +4,13 @@ import threading
 
 """Simple install dialog for tools like git and uv."""
 
+# Color definitions (matching main.py)
+Csuccess      = "#3300ff"  
+Cerror        = "#ff4910"  
+Cmain         = "#ff01f6"  
+Cdarkaccent   = "#000000"  
+Clightshades  = "#F5F5F5"  
+
 # Tool configurations - easy to maintain
 TOOLS = {
 	"git": {
@@ -45,23 +52,23 @@ def _build_dialog(page, tool_name):
 	command = tool["command"]()
 	# Icon
 	icon = ft.Image(src=tool["icon"], width=40, height=40) if tool["icon"] else \
-		   ft.Icon(ft.Icons.INFO_OUTLINED, size=32, color=ft.Colors.PRIMARY)
+		   ft.Icon(ft.Icons.INFO_OUTLINED, size=32, color=Cmain)
 	
 	# Command box with copy button
 	cmd_box = ft.Container(
 		content=ft.Row([
-			ft.Text(command, selectable=True, expand=True, size=12, color=ft.Colors.ON_SURFACE),
+			ft.Text(command, selectable=True, expand=True, size=12, color=Cdarkaccent),
 			ft.IconButton(
 				icon=ft.Icons.CONTENT_COPY, 
 				tooltip="Copy to clipboard",
 				on_click=lambda e: _copy_command(page, command),
 				icon_size=18,
-				icon_color=ft.Colors.PRIMARY
+				icon_color=Cmain
 			),
 		]),
 		padding=12,
-		bgcolor=ft.Colors.BLUE_GREY_50,
-		border=ft.border.all(1, ft.Colors.BLUE_GREY_200),
+		bgcolor=Clightshades,
+		border=ft.border.all(1, Cdarkaccent),
 		border_radius=8,
 	)
 	
@@ -70,8 +77,8 @@ def _build_dialog(page, tool_name):
 		ft.ElevatedButton(
 			"Install now", 
 			icon=ft.Icons.DOWNLOAD,
-			bgcolor=ft.Colors.PRIMARY,
-			color=ft.Colors.WHITE
+			bgcolor=Cmain,
+			color="#FFFFFF"
 		)
 	]
 	if tool.get("homepage"):
@@ -88,14 +95,14 @@ def _build_dialog(page, tool_name):
 		ft.Row([
 			icon, 
 			ft.Column([
-				ft.Text(f"{tool['name']} not found", size=18, weight=ft.FontWeight.BOLD, color=ft.Colors.RED_700),
-				ft.Text("Required for this application", size=12, color=ft.Colors.GREY_600)
+				ft.Text(f"{tool['name']} not found", size=18, weight=ft.FontWeight.BOLD, color=Cerror),
+				ft.Text("Required for this application", size=12, color=Cdarkaccent)
 			], spacing=2, expand=True)
 		], spacing=16, alignment=ft.CrossAxisAlignment.START),
 		ft.Divider(opacity=0.3, height=1),
-		ft.Text(tool["description"], size=13, color=ft.Colors.ON_SURFACE),
+		ft.Text(tool["description"], size=13, color=Cdarkaccent),
 		ft.Container(height=8),
-		ft.Text("Install command:", size=12, weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_700),
+		ft.Text("Install command:", size=12, weight=ft.FontWeight.BOLD, color=Cdarkaccent),
 		cmd_box,
 	], tight=True, spacing=12)
 	
@@ -105,7 +112,7 @@ def _build_dialog(page, tool_name):
 		actions=actions,
 		actions_alignment=ft.MainAxisAlignment.END,
 		shape=ft.RoundedRectangleBorder(radius=16),
-		bgcolor=ft.Colors.WHITE,
+		bgcolor="#FFFFFF",
 		elevation=15,
 		surface_tint_color=ft.Colors.TRANSPARENT,
 	), command

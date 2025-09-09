@@ -12,6 +12,11 @@ SHOW_CONSOLE = True
 CONTACT = "Philippe Soubrier"
 CONTACT_EMAIL = "philippe@example.com"
 
+Csuccess      = "#3300ff"  
+Cerror        = "#ff4910"  
+Cmain         = "#ff01f6"  
+Cdarkaccent   = "#000000"  
+Clightshades  = "#F5F5F5"  
 
 # helper to run a command, returning (code, output)
 def run(cmd):
@@ -45,19 +50,18 @@ def main(page: ft.Page):
     page.title = "Flupke launcher"
     page.window.width = 450
     page.window.height = 450
-    page.bgcolor = ft.Colors.WHITE
-    # allow serving local SVG icons (git.svg, uv.svg)
     page.assets_dir = "icons"
+    page.bgcolor = Clightshades
 
     steps = []  # (name, status_text, ring_container)
 
     def make_step(name):
-        t = ft.Text(name + " ...", size=14, color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.W_500)
+        t = ft.Text(name + " ...", size=14, color=Cdarkaccent, weight=ft.FontWeight.W_500)
         ring = ft.ProgressRing(
-            width=16, height=16, visible=False, color=ft.Colors.BLUE_600, stroke_width=2
+            width=16, height=16, visible=False, color=Cmain, stroke_width=2
         )
         status_icon = ft.Icon(
-            ft.Icons.RADIO_BUTTON_UNCHECKED, size=16, color=ft.Colors.GREY_400, visible=True
+            ft.Icons.RADIO_BUTTON_UNCHECKED, size=16, color=Cdarkaccent, visible=True
         )
 
         icon_stack = ft.Stack([status_icon, ring], width=16, height=16)
@@ -67,18 +71,18 @@ def main(page: ft.Page):
                 [icon_stack, t], alignment=ft.MainAxisAlignment.START, spacing=12
             ),
             padding=ft.padding.symmetric(vertical=8, horizontal=16),
-            border_radius=10,
-            bgcolor=ft.Colors.with_opacity(0.03, ft.Colors.PRIMARY),
-            border=ft.border.all(1, ft.Colors.with_opacity(0.1, ft.Colors.GREY)),
+            bgcolor=Clightshades,
+            border=ft.border.all(1, Cdarkaccent),
+            shadow=ft.BoxShadow(color=Cdarkaccent, offset=ft.Offset(4, 4))
         )
         steps.append((name, t, ring, status_icon))
         return row
 
-    install_note = ft.Text("", size=12, color=ft.Colors.BLUE_GREY_600, italic=True)
+    install_note = ft.Text("", size=12, color=Cmain, italic=True)
     contact = ft.TextButton(
         text=f"{CONTACT} <{CONTACT_EMAIL}>",
         style=ft.ButtonStyle(
-            color=ft.Colors.GREY_600,
+            color=Cdarkaccent,
             text_style=ft.TextStyle(size=10, italic=True)
         ),
         on_click=lambda e: page.launch_url(f"mailto:{CONTACT_EMAIL}")
@@ -88,21 +92,18 @@ def main(page: ft.Page):
     header = ft.Container(
         content=ft.Row(
             [
-                ft.Icon(ft.Icons.ROCKET_LAUNCH, size=24, color=ft.Colors.PRIMARY),
+                ft.Icon(ft.Icons.ROCKET_LAUNCH, size=24, color=Cmain),
                 ft.Text(
                     APP_NAME,
                     size=20,
                     weight=ft.FontWeight.BOLD,
-                    color=ft.Colors.PRIMARY,
+                    color=Cmain,
                 ),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
             spacing=12,
         ),
         padding=ft.padding.all(16),
-        bgcolor=ft.Colors.with_opacity(0.02, ft.Colors.PRIMARY),
-        border_radius=ft.border_radius.only(top_left=16, top_right=16),
-        margin=ft.margin.only(bottom=8),
     )
 
     col = ft.Column(
@@ -116,7 +117,7 @@ def main(page: ft.Page):
             install_note,
             contact,
         ],
-        spacing=8,
+        spacing=12,
         expand=True,
         scroll=ft.ScrollMode.AUTO,
     )
@@ -124,7 +125,7 @@ def main(page: ft.Page):
     # Center the container
     page.add(
         ft.Container(
-            content=col,        
+            content=col,  
         )
     )
 
@@ -137,16 +138,16 @@ def main(page: ft.Page):
 
         if done:
             t.value = t.value.split(" - ")[0] + " - ✓ OK"
-            t.color = ft.Colors.GREEN_700
+            t.color = Csuccess
             status_icon.name = ft.Icons.CHECK_CIRCLE
-            status_icon.color = ft.Colors.GREEN_600
+            status_icon.color = Csuccess
         elif error:
             t.value = t.value.split(" - ")[0] + " - ✗ ERROR"
-            t.color = ft.Colors.RED_700
+            t.color = Cerror
             status_icon.name = ft.Icons.ERROR
-            status_icon.color = ft.Colors.RED_600
+            status_icon.color = Cerror
         elif spinning:
-            t.color = ft.Colors.BLUE_700
+            t.color = Cmain
             status_icon.name = ft.Icons.RADIO_BUTTON_UNCHECKED
 
         page.update()
@@ -155,11 +156,11 @@ def main(page: ft.Page):
         cmd = request_install(page, what)
         if cmd:
             install_note.value = f"⏳ Installing {what}..."
-            install_note.color = ft.Colors.BLUE_700
+            install_note.color = Cmain
             page.update()
             run(cmd)
             install_note.value = f"✅ {what} installation completed."
-            install_note.color = ft.Colors.GREEN_700
+            install_note.color = Csuccess
             page.update()
 
     def flow():
@@ -209,7 +210,7 @@ def main(page: ft.Page):
                 done=True,
             )
             install_note.value = f"⚠️ If the app didn't start, please contact: {CONTACT} <{CONTACT_EMAIL}>"
-            install_note.color = ft.Colors.ORANGE_700
+            install_note.color = Cerror
             page.update()
         if install_note.value == "":
             success_msg = (
@@ -218,7 +219,7 @@ def main(page: ft.Page):
                 else "🚀 App launched successfully. You can close this launcher."
             )
             install_note.value = success_msg
-            install_note.color = ft.Colors.GREEN_700
+            install_note.color = Csuccess
             page.update()
 
     threading.Thread(target=flow, daemon=True).start()
