@@ -1,7 +1,7 @@
 import flet as ft
 import subprocess
 import threading
-from install_dialog import request_install
+from .install_dialog import request_install
 
 # config defaults
 APP_NAME = "UVX Splash"

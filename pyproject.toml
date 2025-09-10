@@ -9,4 +9,5 @@ dependencies = [
 ]
 
 [project.scripts]
-test = "main:print_message"
+test = "src.test:print_message"
+launcher = "src.launcher:run_launcher"
