@@ -9,4 +9,4 @@ dependencies = [
 ]
 
 [project.scripts]
-test = "test:print_message"
+test = "main:print_message"

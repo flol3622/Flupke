@@ -234,4 +234,8 @@ def main(page: ft.Page):
     threading.Thread(target=flow, daemon=True).start()
 
 
-ft.app(main)
+def run_launcher():
+    ft.app(main)
+
+if __name__ == "__main__":
+    ft.app(main)
