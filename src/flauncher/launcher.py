@@ -2,12 +2,14 @@ import flet as ft
 import subprocess
 import threading
 from flauncher.install_dialog import request_install
+import time
 
 # config defaults
 APP_NAME = "UVX Splash"
 REPO_URL = "https://github.com/flol3622/Flupke-launcher"
-UVX_CMD = "uvx --offline git+https://github.com/flol3622/Flupke-launcher@main test"
-UVX_CMD_OFFLINE = "uvx --offline --from git+https://github.com/flol3622/Flupke-launcher@main test"
+UVX_cmd = "uvx --from flauncher test"
+UVX_install_update = "uv tool install git+https://github.com/flol3622/Flupke-launcher"
+UVX_remove = "uv tool uninstall flauncher"
 SHOW_CONSOLE = True
 CONTACT = "Philippe Soubrier"
 CONTACT_EMAIL = "philippe@example.com"
@@ -49,7 +51,7 @@ def launch(cmd):
 def main(page: ft.Page):
     page.title = "Flupke launcher"
     page.window.width = 450
-    page.window.height = 450
+    page.window.height = 500
     page.assets_dir = "icons"
     page.bgcolor = Clightshades
 
@@ -107,9 +109,143 @@ def main(page: ft.Page):
         bgcolor=Cmain
     )
 
+    def run_button_click(e):
+        """Handle Run button click - execute the full flow"""
+        def flow():
+            # uv
+            update_step(0, spinning=True)
+            if have("uv"):
+                update_step(0, done=True)
+            else:
+                update_step(0, text="1. Check uv ... missing", spinning=False)
+                ask_install("uv")
+                if have("uv"):
+                    update_step(0, done=True)
+                else:
+                    update_step(0, error=True)
+                    return
+            # git
+            update_step(1, spinning=True)
+            if have("git"):
+                update_step(1, done=True)
+            else:
+                update_step(1, text="2. Check git ... missing", spinning=False)
+                # prefer winget if present
+                ask_install("git")
+                if have("git"):
+                    update_step(1, done=True)
+                else:
+                    update_step(1, error=True)
+                    return
+            # repo
+            update_step(2, spinning=True)
+            repo_ok = check_repo()
+            if repo_ok:
+                update_step(2, done=True)
+            else:
+                update_step(2, text="3. Check repository ... unreachable", error=True)
+                
+            # launch (prefer fresh install if repo ok, otherwise try cached version)
+            update_step(3, spinning=True)
+            if repo_ok:
+                # Repository is accessible, run install/update command
+                install_note.value = "🔄 Installing/updating from repository..."
+                install_note.color = Cmain
+                page.update()
+                
+                code, output = run(UVX_install_update)
+                if code == 0:
+                    install_note.value = "✅ Install/update completed successfully!"
+                    install_note.color = Csuccess
+                else:
+                    install_note.value = f"⚠️ Install/update had issues: {output[:50]}..."
+                    install_note.color = Cerror
+                page.update()
+                
+                launch(UVX_cmd)
+                update_step(3, done=True)                
+            else:
+                # No repository access, try to use offline/cached version
+                update_step(3, text="4. Launch app ... trying cached version", spinning=True)
+                install_note.value = "⚠️ No repository access - running cached version"
+                install_note.color = Cerror
+                page.update()
+                
+                launch(UVX_cmd)
+                update_step(3, text="4. Launch app ... using cached version", done=True)
+                
+            if install_note.value.startswith("⚠️ No repository access"):
+                pass  # Keep the warning message
+            elif not install_note.value.startswith("⚠️"):
+                success_msg = (
+                    "🚀 App launched in terminal window. You can close this launcher."
+                    if SHOW_CONSOLE
+                    else "🚀 App launched successfully. You can close this launcher."
+                )
+                install_note.value = success_msg
+                install_note.color = Csuccess
+                page.update()
+                time.sleep(1)
+                page.window.close()
+        
+        # Run in separate thread to avoid blocking UI
+        threading.Thread(target=flow, daemon=True).start()
+
+    def clear_cache_click(e):
+        """Handle Clear Cache button click - remove installed flauncher"""
+        def clear_action():
+            install_note.value = "🗑️ Clearing cache..."
+            install_note.color = Cmain
+            page.update()
+            
+            code, output = run(UVX_remove)
+            if code == 0:
+                install_note.value = "✅ Cache cleared successfully!"
+                install_note.color = Csuccess
+            else:
+                install_note.value = f"⚠️ Cache clear had issues: {output[:50]}..."
+                install_note.color = Cerror
+            page.update()
+        
+        # Run in separate thread to avoid blocking UI
+        threading.Thread(target=clear_action, daemon=True).start()
+
+    # Action buttons
+    action_buttons = ft.Container(
+        content=ft.Row(
+            [
+                ft.FilledButton(
+                    text="Run",
+                    icon=ft.Icons.PLAY_ARROW,
+                    bgcolor=Csuccess,
+                    color=Clightshades,
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=0),
+                    ),
+                    on_click=run_button_click,
+                ),
+                ft.FilledButton(
+                    text="Clear Cache",
+                    icon=ft.Icons.CLEAR_ALL,
+                    bgcolor=Clightshades,
+                    color=Cdarkaccent,
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=0),
+                        side=ft.BorderSide(1, Cdarkaccent),
+                    ),
+                    on_click=clear_cache_click,
+                ),
+            ],
+            spacing=12,
+            alignment=ft.MainAxisAlignment.CENTER
+        ),
+        padding=ft.padding.symmetric(horizontal=16, vertical=8),
+    )
+
     col = ft.Column(
         [
             header,
+            action_buttons,
             make_step("1. Check uv"),
             make_step("2. Check git"),
             make_step("3. Check repository"),
@@ -164,75 +300,6 @@ def main(page: ft.Page):
             install_note.value = f"✅ {what} installation completed."
             install_note.color = Cdarkaccent
             page.update()
-
-    def flow():
-        # uv
-        update_step(0, spinning=True)
-        if have("uv"):
-            update_step(0, done=True)
-        else:
-            update_step(0, text="1. Check uv ... missing", spinning=False)
-            ask_install("uv")
-            if have("uv"):
-                update_step(0, done=True)
-            else:
-                update_step(0, error=True)
-                return
-        # git
-        update_step(1, spinning=True)
-        if have("git"):
-            update_step(1, done=True)
-        else:
-            update_step(1, text="2. Check git ... missing", spinning=False)
-            # prefer winget if present
-            ask_install("git")
-            if have("git"):
-                update_step(1, done=True)
-            else:
-                update_step(1, error=True)
-                return
-        # repo
-        update_step(2, spinning=True)
-        repo_ok = check_repo()
-        if repo_ok:
-            update_step(2, done=True)
-        else:
-            update_step(2, text="3. Check repository ... unreachable", error=True)
-            
-        # launch (prefer fresh install if repo ok, otherwise try cached version)
-        update_step(3, spinning=True)
-        if repo_ok:
-            cmd = UVX_CMD
-            launch(cmd)
-            update_step(3, done=True)
-        else:
-            # No repository access, try to use offline/cached version
-            update_step(3, text="4. Launch app ... trying cached version", spinning=True)
-            cmd = UVX_CMD_OFFLINE
-            result = launch(cmd)
-            if result == 0:
-                update_step(3, text="4. Launch app ... using cached version", done=True)
-            else:
-                update_step(
-                    3,
-                    text="4. Launch app ... attempted cached (see terminal)",
-                    spinning=False,
-                    done=True,
-                )
-                install_note.value = f"⚠️ If the app didn't start, please contact: {CONTACT} <{CONTACT_EMAIL}>"
-                install_note.color = Cerror
-                page.update()
-                return
-        if install_note.value == "":
-            success_msg = (
-                "🚀 App launched in terminal window. You can close this launcher."
-                if SHOW_CONSOLE
-                else "🚀 App launched successfully. You can close this launcher."
-            )
-            install_note.value = success_msg
-            page.update()
-
-    threading.Thread(target=flow, daemon=True).start()
 
 
 def run_launcher():
