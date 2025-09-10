@@ -16,5 +16,5 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project.scripts]
-flauncher = "flauncher.launcher:run_launcher"
+launcher = "flauncher.launcher:run_launcher"
 test = "flauncher.test:print_message"

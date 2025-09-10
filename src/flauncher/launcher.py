@@ -6,8 +6,8 @@ from flauncher.install_dialog import request_install
 # config defaults
 APP_NAME = "UVX Splash"
 REPO_URL = "https://github.com/flol3622/Flupke-launcher"
-UVX_CMD = "uvx --from git+https://github.com/flol3622/Flupke-launcher test"
-UVX_CMD_OFFLINE = "uvx --offline --from git+https://github.com/flol3622/Flupke-launcher test"
+UVX_CMD = "uvx --offline git+https://github.com/flol3622/Flupke-launcher@main test"
+UVX_CMD_OFFLINE = "uvx --offline --from git+https://github.com/flol3622/Flupke-launcher@main test"
 SHOW_CONSOLE = True
 CONTACT = "Philippe Soubrier"
 CONTACT_EMAIL = "philippe@example.com"
@@ -197,7 +197,8 @@ def main(page: ft.Page):
         if repo_ok:
             update_step(2, done=True)
         else:
-            update_step(2, text="3. Check repository ... unreachable", spinning=False)
+            update_step(2, text="3. Check repository ... unreachable", error=True)
+            
         # launch (prefer fresh install if repo ok, otherwise try cached version)
         update_step(3, spinning=True)
         if repo_ok:
