@@ -1,17 +1,20 @@
 [project]
-name = "uvx-launcher"
+name = "flauncher"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+authors = [
+    { name = "Philippe Soubrier", email = "philippe.soubrier@ugent.be" }
+]
 requires-python = ">=3.13"
 dependencies = [
     "flet[all]>=0.28.3",
 ]
 
-[tool.uv]
-package = false
-
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project.scripts]
-test = "test:print_message"
-launcher = "launcher:run_launcher"
+flauncher = "flauncher.launcher:run_launcher"
+test = "flauncher.test:print_message"

@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.13"
 
 [[package]]
@@ -151,6 +151,17 @@ sdist = { url = "https://files.pythonhosted.org/packages/78/d7/6c8b3bfe33eeffa20
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e5/47/d63c60f59a59467fda0f93f46335c9d18526d7071f025cb5b89d5353ea42/fastapi-0.116.1-py3-none-any.whl", hash = "sha256:c46ac7c312df840f0c9e220f7964bada936781bc4e2e6eb71f1c4d7553786565", size = 95631, upload-time = "2025-07-11T16:22:30.485Z" },
 ]
+
+[[package]]
+name = "flauncher"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "flet", extra = ["all"] },
+]
+
+[package.metadata]
+requires-dist = [{ name = "flet", extras = ["all"], specifier = ">=0.28.3" }]
 
 [[package]]
 name = "flet"
@@ -660,17 +671,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/47/57/66f061ee118f413cd22a656de622925097170b9380b30091b78ea0c6ea75/uvloop-0.21.0-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:bd53ecc9a0f3d87ab847503c2e1552b690362e005ab54e8a48ba97da3924c0dc", size = 4454428, upload-time = "2024-10-14T23:38:08.416Z" },
     { url = "https://files.pythonhosted.org/packages/63/9a/0962b05b308494e3202d3f794a6e85abe471fe3cafdbcf95c2e8c713aabd/uvloop-0.21.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:a5c39f217ab3c663dc699c04cbd50c13813e31d917642d459fdcec07555cc553", size = 4660018, upload-time = "2024-10-14T23:38:10.888Z" },
 ]
-
-[[package]]
-name = "uvx-launcher"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "flet", extra = ["all"] },
-]
-
-[package.metadata]
-requires-dist = [{ name = "flet", extras = ["all"], specifier = ">=0.28.3" }]
 
 [[package]]
 name = "watchdog"
