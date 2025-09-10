@@ -14,7 +14,7 @@ CONTACT_EMAIL = "philippe@example.com"
 
 Csuccess      = "#3300ff"  
 Cerror        = "#ff4910"  
-Cmain         = "#ff01f6"  
+Cmain         = "#FFBC42"  ##FFBC42
 Cdarkaccent   = "#000000"  
 Clightshades  = "#F5F5F5"  
 
@@ -78,7 +78,7 @@ def main(page: ft.Page):
         steps.append((name, t, ring, status_icon))
         return row
 
-    install_note = ft.Text("", size=12, color=Cmain, italic=True)
+    install_note = ft.Text("", size=12, color=Cdarkaccent, italic=True)
     contact = ft.TextButton(
         text=f"{CONTACT} <{CONTACT_EMAIL}>",
         style=ft.ButtonStyle(
@@ -92,18 +92,19 @@ def main(page: ft.Page):
     header = ft.Container(
         content=ft.Row(
             [
-                ft.Icon(ft.Icons.ROCKET_LAUNCH, size=24, color=Cmain),
+                ft.Icon(ft.Icons.ROCKET_LAUNCH, size=24, color=Cdarkaccent),
                 ft.Text(
                     APP_NAME,
                     size=20,
                     weight=ft.FontWeight.BOLD,
-                    color=Cmain,
+                    color=Cdarkaccent,
                 ),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
-            spacing=12,
+            spacing=12,            
         ),
         padding=ft.padding.all(16),
+        bgcolor=Cmain
     )
 
     col = ft.Column(
@@ -125,7 +126,8 @@ def main(page: ft.Page):
     # Center the container
     page.add(
         ft.Container(
-            content=col,  
+            content=col,
+            padding=ft.padding.all(10),
         )
     )
 
@@ -160,7 +162,7 @@ def main(page: ft.Page):
             page.update()
             run(cmd)
             install_note.value = f"✅ {what} installation completed."
-            install_note.color = Csuccess
+            install_note.color = Cdarkaccent
             page.update()
 
     def flow():
@@ -219,7 +221,6 @@ def main(page: ft.Page):
                 else "🚀 App launched successfully. You can close this launcher."
             )
             install_note.value = success_msg
-            install_note.color = Csuccess
             page.update()
 
     threading.Thread(target=flow, daemon=True).start()
