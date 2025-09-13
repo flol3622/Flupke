@@ -18,3 +18,13 @@ build-backend = "hatchling.build"
 [project.scripts]
 launcher = "flauncher.launcher:run_launcher"
 test = "flauncher.test:print_message"
+
+[tool.flauncher]
+app_name = "UVX Splash"
+repo_url = "https://github.com/flol3622/Flupke-launcher"
+uvx_cmd = "uvx --from flauncher test"
+UVX_install_update = "uv tool install git+https://github.com/flol3622/Flupke-launcher"
+uvx_remove = "uv tool uninstall flauncher"
+show_console = True
+contact = "Flol3622"
+contact_email = "flupke@example.com"

@@ -11,8 +11,8 @@ UVX_cmd = "uvx --from flauncher test"
 UVX_install_update = "uv tool install git+https://github.com/flol3622/Flupke-launcher"
 UVX_remove = "uv tool uninstall flauncher"
 SHOW_CONSOLE = True
-CONTACT = "Philippe Soubrier"
-CONTACT_EMAIL = "philippe@example.com"
+CONTACT = "Flol3622"
+CONTACT_EMAIL = "flupke@example.com"
 
 Csuccess      = "#3300ff"  
 Cerror        = "#ff4910"  
@@ -114,7 +114,7 @@ def main(page: ft.Page):
         def flow():
             # uv
             update_step(0, spinning=True)
-            if have("uv"):
+            if not have("uv"):
                 update_step(0, done=True)
             else:
                 update_step(0, text="1. Check uv ... missing", spinning=False)
